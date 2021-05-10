@@ -6,14 +6,16 @@ import Grid, {GridState} from "./grid";
 export default class Snake {
     private _body: Position[];
     private currentDirection: Direction;
+    public lastTailPosition: Position;
 
     constructor() {
         this.init();
     }
 
     init() {
-        this._body = new Array(new Position(1, 1));
+        this._body = new Array(new Position(3, 1), new Position(2, 1), new Position(1, 1));
         this.currentDirection = Direction.Right;
+        this.lastTailPosition = this.head;
     }
     
     get body() {
@@ -68,7 +70,7 @@ export default class Snake {
     move() {
         let newPosition = this.getNewPosition();
         this.body.unshift(newPosition);
-        this.body.pop();
+        this.lastTailPosition = this.body.pop();
     }
 
 }

@@ -5,14 +5,15 @@ import { Direction } from "./util/direction";
 import Game from "./game";
 
 const sketch = (p5: P5) => {
-    const CANVAS_SIZE = 800;
-    const GRID_SIZE = 50;
+    const CANVAS_SIZE = 600;
+    const GRID_SIZE = 30;
     const SCALE = CANVAS_SIZE / GRID_SIZE;
-    const FRAME_RATE = 7;
+    const FRAME_RATE = 60;
 
     let game: Game;
     let sketcher: Sketcher;
     let directionLocked: boolean = false;
+    let pendingDirectionChange: Direction | undefined;
 
     function initGame() {
         sketcher = new Sketcher(p5, SCALE); 
@@ -31,11 +32,13 @@ const sketch = (p5: P5) => {
     p5.draw = () => {
         sketcher.drawGrid(game.grid); 
 
-        game.tick();
-        game.checkState();
+        if (sketcher.lerpAmount === 0) {
+            game.tick();
+            game.checkState();
+            directionLocked = false;
+        }
 
         sketcher.drawSnake(game.snake);
-        directionLocked = false;
     };
 
     p5.keyPressed = () => {
@@ -55,9 +58,13 @@ const sketch = (p5: P5) => {
             break;
 
         };
-        if (!directionLocked && direction !== undefined) {
-            game.changeSnakeDirection(direction);
+        if (direction !== undefined) {
+            pendingDirectionChange = direction;
+        }
+        if (!directionLocked && pendingDirectionChange !== undefined) {
+            game.changeSnakeDirection(pendingDirectionChange);
             directionLocked = true;
+            pendingDirectionChange = undefined;
         }
     };
 };
