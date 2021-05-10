@@ -1,5 +1,6 @@
 import Position from "./util/position";
 import { Direction, oppositeof } from "./util/direction";
+import Grid, {GridState} from "./grid";
 
 
 export default class Snake {
@@ -7,7 +8,11 @@ export default class Snake {
     private currentDirection: Direction;
 
     constructor() {
-        this._body = new Array(new Position(0, 0));
+        this.init();
+    }
+
+    init() {
+        this._body = new Array(new Position(1, 1));
         this.currentDirection = Direction.Right;
     }
     
@@ -26,8 +31,21 @@ export default class Snake {
         }
     }
 
-    ateFood(foodPos: Position): boolean {
+    eatsFood(foodPos: Position): boolean {
         return this.head.isEqual(foodPos);
+    }
+
+    eatsItself(): boolean {
+        return this.body.slice(1).some((node) => this.head.isEqual(node));
+    }
+
+    hitsBlock(grid: Grid): boolean {
+        let state = grid.getState(this.head.y, this.head.x);
+        return state === GridState.Blocked;
+    }
+
+    reset() {
+        this.init();
     }
 
     grow() {

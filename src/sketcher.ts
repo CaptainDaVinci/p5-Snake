@@ -22,6 +22,9 @@ export default class Sketcher {
           case GridState.Snake:
             this.p5.fill(0, 255, 0);
             break;
+          case GridState.SnakeHead:
+            this.p5.fill(0, 200, 0);
+            break;
           default:
             this.p5.fill(255, 255, 255);
             break;
@@ -29,8 +32,7 @@ export default class Sketcher {
     }
 
     drawGrid(grid: Grid) {
-        this.p5.stroke(10);
-        this.p5.strokeWeight(1);
+        this.p5.noStroke();
         for (let i = 0; i < grid.size; ++i) {
             for (let j = 0; j < grid.size; ++j) {
                 let y = i * this.scale, x = j * this.scale;
@@ -41,10 +43,16 @@ export default class Sketcher {
     }
 
     drawSnake(snake: Snake) {
-        this.p5.noStroke();
+        this.p5.stroke(100);
+        this.p5.strokeWeight(1);
+
+        this.fillColour(GridState.SnakeHead);
+        this.p5.square(snake.head.x * this.scale, snake.head.y * this.scale, this.scale);
+
         this.fillColour(GridState.Snake);
-        for (let position of snake.body) {
-            this.p5.square(position.x * this.scale, position.y * this.scale, this.scale);
+        for (let i = 1; i < snake.body.length; ++i) {
+            let pos = snake.body[i];
+            this.p5.square(pos.x * this.scale, pos.y * this.scale, this.scale);
         }
     }
 }

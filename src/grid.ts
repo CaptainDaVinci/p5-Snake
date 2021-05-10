@@ -5,7 +5,8 @@ export enum GridState {
     Empty,
     Food,
     Blocked,
-    Snake
+    Snake,
+    SnakeHead
 }
 
 
@@ -20,7 +21,18 @@ export default class Grid {
                         .fill(GridState.Empty)
                         .map(() => new Array(this.size)
                         .fill(GridState.Empty));
+        this.populateBlocks();
         this.generateFoodAtRandomXY();
+    }
+
+    populateBlocks() {
+        // border
+        for (let i = 0; i < this.size; ++i) {
+            this.grid[i][0] = GridState.Blocked;
+            this.grid[i][this.size - 1] = GridState.Blocked;
+            this.grid[0][i] = GridState.Blocked;
+            this.grid[this.size - 1][i] = GridState.Blocked;
+        }
     }
 
     get size() {
@@ -40,11 +52,17 @@ export default class Grid {
             this.grid[this.foodPos.y][this.foodPos.x] = GridState.Empty;
         }
 
-        let x = getRandint(0, this.size - 1);
-        let y = getRandint(0, this.size - 1);
+        let x = getRandint(0, this.size - 2);
+        let y = getRandint(0, this.size - 2);
+
+        while (this.grid[y][x] !== GridState.Empty) {
+            x = getRandint(0, this.size - 2);
+            y = getRandint(0, this.size - 2);
+        }
 
         this.grid[y][x] = GridState.Food;
         this._foodPos = new Position(x, y);
     }
 
 }
+

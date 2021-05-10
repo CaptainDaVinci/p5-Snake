@@ -1,24 +1,22 @@
 import P5 from "p5";
 import "p5/lib/addons/p5.dom";
-import Grid from "./grid";
-import Snake from "./snake";
 import Sketcher from "./sketcher";
 import { Direction } from "./util/direction";
+import Game from "./game";
 
 const sketch = (p5: P5) => {
     const CANVAS_SIZE = 800;
     const GRID_SIZE = 50;
     const SCALE = CANVAS_SIZE / GRID_SIZE;
-    const FRAME_RATE = 15;
+    const FRAME_RATE = 7;
 
-    let grid: Grid;
-    let snake: Snake;
+    let game: Game;
     let sketcher: Sketcher;
+    let directionLocked: boolean = false;
 
     function initGame() {
         sketcher = new Sketcher(p5, SCALE); 
-        grid = new Grid(GRID_SIZE);
-        snake = new Snake();
+        game = new Game(GRID_SIZE);
     }
 
     p5.setup = () => {
@@ -31,13 +29,13 @@ const sketch = (p5: P5) => {
     };
 
     p5.draw = () => {
-        snake.move();
-        if (snake.ateFood(grid.foodPos)) {
-            snake.grow();
-            grid.generateFoodAtRandomXY();
-        }
-        sketcher.drawGrid(grid); 
-        sketcher.drawSnake(snake);
+        sketcher.drawGrid(game.grid); 
+
+        game.tick();
+        game.checkState();
+
+        sketcher.drawSnake(game.snake);
+        directionLocked = false;
     };
 
     p5.keyPressed = () => {
@@ -57,7 +55,10 @@ const sketch = (p5: P5) => {
             break;
 
         };
-        snake.changeDirection(direction);
+        if (!directionLocked && direction !== undefined) {
+            game.changeSnakeDirection(direction);
+            directionLocked = true;
+        }
     };
 };
 
