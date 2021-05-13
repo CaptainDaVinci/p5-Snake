@@ -13,7 +13,7 @@ export default class Snake {
     }
 
     init() {
-        this._body = new Array(new Position(3, 1), new Position(2, 1), new Position(1, 1));
+        this._body = new Array(new Position(4, 1), new Position(3, 1), new Position(2, 1), new Position(1, 1));
         this.currentDirection = Direction.Right;
         this.lastTailPosition = this.head;
     }
