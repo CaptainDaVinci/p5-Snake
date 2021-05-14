@@ -1,6 +1,6 @@
 import Grid from "./grid";
 import Snake from "./snake";
-import {Direction} from "./util/direction";
+import Vec2 from "./util/vector2";
 
 export default class Game {
     private _snake: Snake;
@@ -38,7 +38,7 @@ export default class Game {
         }
     }
 
-    changeSnakeDirection(direction: Direction) {
+    changeSnakeDirection(direction: Vec2) {
         this.snake.changeDirection(direction);
     }
 }

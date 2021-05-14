@@ -1,31 +1,24 @@
-import Position from "./position";
+import Vec2 from "./vector2";
 
-export enum Direction {
-    Up, Down, Left, Right
-}
+export default class Direction {
+    static get right(): Vec2 {
+        return new Vec2(1, 0);
+    }
 
-export function oppositeof(direction: Direction) {
-    switch (direction) {
-        case Direction.Up:
-            return Direction.Down;
-        case Direction.Down:
-            return Direction.Up;
-        case Direction.Left:
-            return Direction.Right;
-        case Direction.Right:
-            return Direction.Left;
+    static get left(): Vec2 {
+        return new Vec2(-1, 0);
+    }
+
+    static get up(): Vec2 {
+        return new Vec2(0, -1);
+    }
+
+    static get down(): Vec2 {
+        return new Vec2(0, 1);
     }
 }
 
-export function getpos(direction: Direction) {
-    switch (direction) {
-        case Direction.Up:
-            return new Position(0, -1);
-        case Direction.Down:
-            return new Position(0, 1);
-        case Direction.Left:
-            return new Position(-1, 0);
-        case Direction.Right:
-            return new Position(1, 0);
-    }
+export function oppositeof(direction: Vec2) {
+    return direction.mult(-1);
 }
+

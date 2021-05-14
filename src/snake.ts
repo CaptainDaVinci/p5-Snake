@@ -1,7 +1,8 @@
-import Position from "./util/position";
-import { Direction, getpos, oppositeof } from "./util/direction";
+import Direction, { oppositeof } from "./util/direction";
 import Grid, {GridState} from "./grid";
 import Part from "./part";
+import {SCALE, SPEED_MUL} from "./constant";
+import Vec2 from "./util/vector2";
 
 
 export default class Snake {
@@ -12,10 +13,10 @@ export default class Snake {
     }
 
     init() {
-        this.body = new Array(new Part(new Position(4, 1), Direction.Right), 
-                               new Part(new Position(3, 1), Direction.Right), 
-                               new Part(new Position(2, 1), Direction.Right), 
-                               new Part(new Position(1, 1), Direction.Right));
+        this.body = new Array();
+        for (let i = 4; i > 0; --i) {
+            this.body.push(new Part(new Vec2(i, 1), Direction.right));
+        }
     }
     
     get head() {
@@ -26,19 +27,19 @@ export default class Snake {
         return this.body[this.body.length - 1];
     }
 
-    changeDirection(direction: Direction | undefined) {
+    changeDirection(direction: Vec2 | undefined) {
         if (direction !== undefined &&
-             this.head.direction !== oppositeof(direction)) {
+             !this.head.direction.equals(oppositeof(direction))) {
             this.head.direction = direction;
         }
     }
 
-    eatsFood(foodPos: Position): boolean {
-        return this.head.gridPosition.isEqual(foodPos);
+    eatsFood(foodPos: Vec2): boolean {
+        return this.head.gridPosition.equals(foodPos);
     }
 
     eatsItself(): boolean {
-        return this.body.slice(1).some((node) => this.head.gridPosition.isEqual(node.gridPosition));
+        return this.body.slice(1).some((node) => this.head.gridPosition.equals(node.gridPosition));
     }
 
     hitsBlock(grid: Grid): boolean {
@@ -51,24 +52,23 @@ export default class Snake {
     }
 
     grow() {
-        let part = new Part(this.tail.gridPosition.add(getpos(this.tail.direction).mul(-1)), this.tail.direction);
-        //part.targetPosition = this.tail.currentPosition.copy();
+        let part = new Part(this.tail.gridPosition.addv(this.tail.direction.mult(-1)), this.tail.direction.copy());
         this.body.push(part);
     }
 
     move() {
         for (let part of this.body) {
-            part.gridPosition = part.gridPosition.add(getpos(part.direction));
-            part.targetPosition = part.gridPosition.mul(20).add(new Position(10, 10));
+            part.gridPosition.addit(part.direction.x, part.direction.y);
+            part.targetPosition = part.gridPosition.add(0.5, 0.5).multit(SCALE);
         }
         for (let i = this.body.length - 1; i > 0; --i) {
-            this.body[i].direction = this.body[i - 1].direction;
+            this.body[i].direction = this.body[i - 1].direction.copy();
         }
     }
 
     drift() {
         for (let part of this.body) {
-            part.currentPosition = part.currentPosition.add(part.targetPosition.sub(part.currentPosition).mul(0.20));
+            part.currentPosition.addvit(part.targetPosition.subv(part.currentPosition).multit(SPEED_MUL));
         }
     }
 

@@ -1,5 +1,5 @@
-import Position from "./util/position";
 import {getRandint} from "./util/util";
+import Vec2 from "./util/vector2";
 
 export enum GridState {
     Empty,
@@ -13,7 +13,7 @@ export enum GridState {
 export default class Grid {
     private grid: GridState[][];
     private _size: number;
-    private _foodPos: Position;
+    private _foodPos: Vec2;
 
     constructor(size: number) {
         this._size = size;
@@ -61,7 +61,7 @@ export default class Grid {
         }
 
         this.grid[y][x] = GridState.Food;
-        this._foodPos = new Position(x, y);
+        this._foodPos = new Vec2(x, y);
     }
 
 }
