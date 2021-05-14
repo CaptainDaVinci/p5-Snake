@@ -1,48 +1,48 @@
 import Position from "./util/position";
-import { Direction, oppositeof } from "./util/direction";
+import { Direction, getpos, oppositeof } from "./util/direction";
 import Grid, {GridState} from "./grid";
+import Part from "./part";
 
 
 export default class Snake {
-    private _body: Position[];
-    private currentDirection: Direction;
-    public lastTailPosition: Position;
+    public body: Part[];
 
     constructor() {
         this.init();
     }
 
     init() {
-        this._body = new Array(new Position(4, 1), new Position(3, 1), new Position(2, 1), new Position(1, 1));
-        this.currentDirection = Direction.Right;
-        this.lastTailPosition = this.head;
+        this.body = new Array(new Part(new Position(4, 1), Direction.Right), 
+                               new Part(new Position(3, 1), Direction.Right), 
+                               new Part(new Position(2, 1), Direction.Right), 
+                               new Part(new Position(1, 1), Direction.Right));
     }
     
-    get body() {
-        return this._body;
-    }
-
     get head() {
         return this.body[0];
     }
 
+    get tail() {
+        return this.body[this.body.length - 1];
+    }
+
     changeDirection(direction: Direction | undefined) {
         if (direction !== undefined &&
-             this.currentDirection !== oppositeof(direction)) {
-            this.currentDirection = direction;
+             this.head.direction !== oppositeof(direction)) {
+            this.head.direction = direction;
         }
     }
 
     eatsFood(foodPos: Position): boolean {
-        return this.head.isEqual(foodPos);
+        return this.head.gridPosition.isEqual(foodPos);
     }
 
     eatsItself(): boolean {
-        return this.body.slice(1).some((node) => this.head.isEqual(node));
+        return this.body.slice(1).some((node) => this.head.gridPosition.isEqual(node.gridPosition));
     }
 
     hitsBlock(grid: Grid): boolean {
-        let state = grid.getState(this.head.y, this.head.x);
+        let state = grid.getState(this.head.gridPosition.y, this.head.gridPosition.x);
         return state === GridState.Blocked;
     }
 
@@ -51,26 +51,25 @@ export default class Snake {
     }
 
     grow() {
-        this.body.unshift(this.head);
-    }
-
-    getNewPosition() {
-        switch (this.currentDirection) {
-            case Direction.Right:
-                return new Position(this.head.x + 1, this.head.y);
-            case Direction.Left:
-                return new Position(this.head.x - 1, this.head.y);
-            case Direction.Up:
-                return new Position(this.head.x, this.head.y - 1);
-            case Direction.Down:
-                return new Position(this.head.x, this.head.y + 1);
-        }
+        let part = new Part(this.tail.gridPosition.add(getpos(this.tail.direction).mul(-1)), this.tail.direction);
+        //part.targetPosition = this.tail.currentPosition.copy();
+        this.body.push(part);
     }
 
     move() {
-        let newPosition = this.getNewPosition();
-        this.body.unshift(newPosition);
-        this.lastTailPosition = this.body.pop();
+        for (let part of this.body) {
+            part.gridPosition = part.gridPosition.add(getpos(part.direction));
+            part.targetPosition = part.gridPosition.mul(20).add(new Position(10, 10));
+        }
+        for (let i = this.body.length - 1; i > 0; --i) {
+            this.body[i].direction = this.body[i - 1].direction;
+        }
+    }
+
+    drift() {
+        for (let part of this.body) {
+            part.currentPosition = part.currentPosition.add(part.targetPosition.sub(part.currentPosition).mul(0.20));
+        }
     }
 
 }

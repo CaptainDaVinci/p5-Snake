@@ -17,4 +17,14 @@ export default class Position {
     mul(n: number): Position {
         return new Position(this.x * n, this.y * n);
     }
+
+    copy(): Position {
+        return new Position(this.x, this.y);
+    }
+
+    dist(oth: Position) {
+        let dx = oth.x - this.x;
+        let dy = oth.y - this.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
 }

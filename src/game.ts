@@ -23,6 +23,10 @@ export default class Game {
         this.snake.move();    
     }
 
+    driftSnake() {
+        this.snake.drift();
+    }
+
     checkState() {
         if (this.snake.eatsItself() || this.snake.hitsBlock(this.grid)) {
             this.snake.reset();

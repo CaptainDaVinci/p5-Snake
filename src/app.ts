@@ -14,7 +14,7 @@ const sketch = (p5: P5) => {
     let sketcher: Sketcher;
     let directionLocked: boolean = false;
     let pendingDirectionChange: Direction | undefined;
-
+    let tick: number = 0;
     function initGame() {
         sketcher = new Sketcher(p5, SCALE); 
         game = new Game(GRID_SIZE);
@@ -30,14 +30,14 @@ const sketch = (p5: P5) => {
     };
 
     p5.draw = () => {
-        sketcher.drawGrid(game.grid); 
-
-        if (sketcher.lerpAmount === 0) {
-            game.tick();
+        game.driftSnake();
+        if (tick % 5 === 0) {
             game.checkState();
+            game.tick();
             directionLocked = false;
         }
-
+        tick++;
+        sketcher.drawGrid(game.grid); 
         sketcher.drawSnake(game.snake);
     };
 
